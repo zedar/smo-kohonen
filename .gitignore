@@ -1,0 +1,10 @@
+*.iml
+*.ipr
+*.iws
+build
+.gradle
+**/*.iml
+**/*.ipr
+**/*.iws
+**/build
+**/.gradle
