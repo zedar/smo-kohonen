@@ -8,3 +8,4 @@ build
 **/*.iws
 **/build
 **/.gradle
+out/iter*.txt

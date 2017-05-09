@@ -46,5 +46,18 @@ public class KohonenNeuron {
 //      return value;
   }
 
+  public String toString(){
+    String text="";
+    text += "[ ";
+    int weightSize = weights.length;
+    for (int i = 0; i < weightSize; i++){
+      text += weights[i];
+      if(i < weightSize - 1) {
+        text += ", ";
+      }
+    }
+    text += " ]";
+    return text;
+  }
 
 }
