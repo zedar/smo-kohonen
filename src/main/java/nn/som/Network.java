@@ -21,6 +21,10 @@ public class Network {
     return neurons.length;
   }
 
+  public MatrixTopology getTopology() {
+    return this.topology;
+  }
+
   public String toString(){
     String text = "";
     for (int i=0; i< neurons.length; i++ ){
@@ -31,6 +35,4 @@ public class Network {
     }
     return text;
   }
-
-
 }

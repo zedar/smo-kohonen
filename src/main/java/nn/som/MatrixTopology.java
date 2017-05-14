@@ -89,7 +89,7 @@ public class MatrixTopology {
 
   private List getN(List tempConnection) {
     List neighborgoodConns = new ArrayList();
-    List tempConns         = new ArrayList();
+    List tempConns;
 
     for (int j = 0; j < tempConnection.size(); j++) {
       tempConns = getConnectedNeurons((java.lang.Integer)tempConnection.get(j));
