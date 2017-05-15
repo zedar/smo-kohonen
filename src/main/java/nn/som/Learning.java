@@ -1,7 +1,6 @@
 package nn.som;
 
-import java.util.Iterator;
-import java.util.TreeMap;
+import java.util.*;
 
 public class Learning {
   private Network network;
@@ -74,6 +73,19 @@ public class Learning {
     }
   }
 
+  public void learnGas() {
+    int dataSize = learningData.length;
+    for (int i = 0; i < maxIterations; i++) {
+      for (int j = 0; j < dataSize; j++) {
+        double[] vector = learningData[j];
+        changeWeightGas(vector, i);
+      }
+      if (dumpIteration && dumpFilePrefix != null) {
+        FileUtils.saveNetworkToFile(network, dumpFilePrefix+i+(dumpFileExt != null ? dumpFileExt : ""));
+      }
+    }
+  }
+
   private int getBestNeuron(double[] vector){
     KohonenNeuron tempNeuron;
     double distance, bestDistance = -1;
@@ -122,6 +134,33 @@ public class Learning {
   }
 
   private void changeWeightGas(double[] vector, int iteration) {
-    
+    // calculate distance of every neuron from the vector
+    List<TransientNeuron> transientNeurons = new ArrayList<>();
+    for (int i = 0; i < network.getNumOfNeurons(); i++) {
+      KohonenNeuron neuron = network.getNeuron(i);
+      double distance = EuclidesDistance.calcDistance(neuron.getWeights(), vector);
+      transientNeurons.add(new TransientNeuron(neuron, distance));
+    }
+
+    // sort neurons by the distance from input vector
+    TransientNeuron[] ordered = transientNeurons.stream()
+        .sorted((n1, n2) -> {
+          if (n1.getDistance() > n2.getDistance()) {
+            return 1;
+          } else if (n1.getDistance() < n2.getDistance()) {
+            return -1;
+          } else {
+            return 0;
+          }
+        })
+        .toArray(TransientNeuron[]::new);
+
+    for (int i = 0; i < ordered.length; i++) {
+      double[] weights = ordered[i].getNeuron().getWeights();
+      double factor = Math.exp(-i/neighbourhoodRadius);
+      for (int j = 0; j < weights.length; j++) {
+        weights[j] += learningFactor * factor * (vector[j] - weights[j]);
+      }
+    }
   }
 }

@@ -10,9 +10,10 @@ public class Main {
     double[][] data = FileUtils.loadTrainingData("data/dane_test.txt");
 
     Learning learning = new Learning(network, 20, data, learningFactor, neighbourhoodRadius);
-    learning.setDumpIteration(true).setDumpFilePrefix("out/iter_").setDumpFileExt(".txt");
+    learning.setDumpIteration(false).setDumpFilePrefix("out/iter_").setDumpFileExt(".txt");
     //learning.learnWTA();
-    learning.learnWTM();
+    //learning.learnWTM();
+    learning.learnGas();
 
     System.out.println(network.toString());
     FileUtils.saveNetworkToFile(network, "out/final.txt");
