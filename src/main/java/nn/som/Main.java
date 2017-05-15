@@ -9,7 +9,7 @@ public class Main {
     double neighbourhoodRadius = 0.8;
     double[][] data = FileUtils.loadTrainingData("data/dane_test.txt");
 
-    Learning learning = new Learning(network, 20, data, learningFactor, neighbourhoodRadius);
+    Learning learning = new Learning(network, 200, data, learningFactor, neighbourhoodRadius);
     learning.setDumpIteration(false).setDumpFilePrefix("out/iter_").setDumpFileExt(".txt");
     //learning.learnWTA();
     //learning.learnWTM();

@@ -6,8 +6,15 @@ public class Learning {
   private Network network;
   private int maxIterations=20;
   private double[][] learningData;
+
   private double learningFactor = 0.8;
+  private double minLearningFactpr = 0.01;
+  private double maxLearningFactor = learningFactor;
+
   private double neighbourhoodRadius = 0.8;
+  private double minNeighbourhoodRadius = 0.1;
+  private double maxNeighbourhoodRadius = neighbourhoodRadius;
+
   private String dumpFilePrefix;
   private String dumpFileExt;
   private boolean dumpIteration;
@@ -18,11 +25,13 @@ public class Learning {
     this.maxIterations = maxIterations;
     this.learningData = learningData;
     this.learningFactor = learningFactor;
+    this.maxLearningFactor = learningFactor;
   }
 
   public Learning(final Network network, final int maxIterations, final double[][] learningData, final double learningFactor, final double neighbourhoodRadius) {
     this(network, maxIterations, learningData, learningFactor);
     this.neighbourhoodRadius = neighbourhoodRadius;
+    this.maxNeighbourhoodRadius = neighbourhoodRadius;
   }
 
   public Learning setDumpFilePrefix(String dumpFilePrefix) {
@@ -70,6 +79,8 @@ public class Learning {
       if (dumpIteration && dumpFilePrefix != null) {
         FileUtils.saveNetworkToFile(network, dumpFilePrefix+i+(dumpFileExt != null ? dumpFileExt : ""));
       }
+      changeNeighbourhoodRadius(i+1);
+      changeLearningFactor(i+1);
     }
   }
 
@@ -83,6 +94,8 @@ public class Learning {
       if (dumpIteration && dumpFilePrefix != null) {
         FileUtils.saveNetworkToFile(network, dumpFilePrefix+i+(dumpFileExt != null ? dumpFileExt : ""));
       }
+      changeNeighbourhoodRadius(i+1);
+      changeLearningFactor(i+1);
     }
   }
 
@@ -162,5 +175,13 @@ public class Learning {
         weights[j] += learningFactor * factor * (vector[j] - weights[j]);
       }
     }
+  }
+
+  private void changeNeighbourhoodRadius(int iteration) {
+    neighbourhoodRadius = maxNeighbourhoodRadius * Math.pow(minNeighbourhoodRadius / maxNeighbourhoodRadius, iteration / maxIterations);
+  }
+
+  private void changeLearningFactor(int iteration) {
+    learningFactor = maxLearningFactor * Math.pow(minLearningFactpr / maxLearningFactor, iteration / maxIterations);
   }
 }
