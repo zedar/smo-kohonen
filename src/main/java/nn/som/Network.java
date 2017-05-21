@@ -4,12 +4,12 @@ public class Network {
   private KohonenNeuron[] neurons;
   private MatrixTopology topology;
 
-  public Network(double[] maxWeights, MatrixTopology topology) {
+  public Network(double[][] minmaxWeights, double initNeuronPotential, MatrixTopology topology) {
     this.topology = topology;
     int numOfNeurons = topology.getNumbersOfNeurons();
     this.neurons = new KohonenNeuron[numOfNeurons];
     for (int i = 0; i < numOfNeurons; i++) {
-      this.neurons[i] = new KohonenNeuron(maxWeights.length, maxWeights);
+      this.neurons[i] = new KohonenNeuron(minmaxWeights.length, minmaxWeights, initNeuronPotential);
     }
   }
 

@@ -59,9 +59,10 @@ public class Learning {
         vector = learningData[j];
         bestNeuron = getBestNeuron(vector);
         changeNeuronWeightWTA(bestNeuron, vector, i);
+        changeNeuronPotential(bestNeuron);
       }
       if (dumpIteration && dumpFilePrefix != null) {
-        FileUtils.saveNetworkToFile(network, dumpFilePrefix+i+(dumpFileExt != null ? dumpFileExt : ""));
+        FileUtils.saveNetworkToFile(network, dumpFilePrefix+(i+1)+(dumpFileExt != null ? dumpFileExt : ""));
       }
     }
   }
@@ -75,9 +76,10 @@ public class Learning {
         vector = learningData[j];
         bestNeuron = getBestNeuron(vector)+1;
         changeWeightWTM(bestNeuron, vector, i);
+        changeNeuronPotential(bestNeuron);
       }
       if (dumpIteration && dumpFilePrefix != null) {
-        FileUtils.saveNetworkToFile(network, dumpFilePrefix+i+(dumpFileExt != null ? dumpFileExt : ""));
+        FileUtils.saveNetworkToFile(network, dumpFilePrefix+(i+1)+(dumpFileExt != null ? dumpFileExt : ""));
       }
       changeNeighbourhoodRadius(i+1);
       changeLearningFactor(i+1);
@@ -92,7 +94,7 @@ public class Learning {
         changeWeightGas(vector, i);
       }
       if (dumpIteration && dumpFilePrefix != null) {
-        FileUtils.saveNetworkToFile(network, dumpFilePrefix+i+(dumpFileExt != null ? dumpFileExt : ""));
+        FileUtils.saveNetworkToFile(network, dumpFilePrefix+(i+1)+(dumpFileExt != null ? dumpFileExt : ""));
       }
       changeNeighbourhoodRadius(i+1);
       changeLearningFactor(i+1);
@@ -106,6 +108,9 @@ public class Learning {
     int bestNeuron = 0;
     for(int i = 0; i < networkSize; i++){
       tempNeuron = network.getNeuron(i);
+      if (tempNeuron.isWaiting()) {
+        continue;
+      }
       distance = EuclidesDistance.calcDistance(tempNeuron.getWeights(), vector);
       if((distance < bestDistance) || (bestDistance == -1)){
         bestDistance = distance;
@@ -116,12 +121,18 @@ public class Learning {
   }
 
   private void changeNeuronWeightWTA(int neuronNumber, double[] vector, int iteration) {
-    double[] weights = network.getNeuron(neuronNumber).getWeights();
+    KohonenNeuron neuron = network.getNeuron(neuronNumber);
+    double[] weights = neuron.getWeights();
     int weightNumber = weights.length;
     double weight;
     for (int i = 0; i < weightNumber; i++) {
       weight = weights[i];
       weights[i] += learningFactor * (vector[i] - weight);
+    }
+    // update potential for the winning algorithm
+    neuron.setPotential(neuron.getPotential() - KohonenNeuron.P_MIN);
+    if (neuron.getPotential() < KohonenNeuron.P_MIN) {
+      neuron.setWaiting(true);
     }
   }
 
@@ -136,7 +147,11 @@ public class Learning {
   }
 
   private void changeNeuronWeightWTM(int neuronNumber, double[] vector, int iteration, int distance) {
-    double[] weights = network.getNeuron(neuronNumber-1).getWeights();
+    KohonenNeuron neuron = network.getNeuron(neuronNumber-1);
+//    if (neuron.isWaiting()) {
+//      return;
+//    }
+    double[] weights = neuron.getWeights();
     int weightNumber = weights.length;
     double weight;
     for (int i=0; i < weightNumber; i++) {
@@ -144,6 +159,21 @@ public class Learning {
       weights[i] += learningFactor * GaussNeighbourhood.calc(neighbourhoodRadius, distance) * (vector[i] - weight);
     }
     //network.getNeuron(neuronNumber).setWeights(weights);
+  }
+
+  private void changeNeuronPotential(int bestNeuron) {
+    for (int i = 0; i < network.getNumOfNeurons(); i++) {
+      KohonenNeuron neuron = network.getNeuron(i);
+      neuron.setWaiting(false);
+      if (i == bestNeuron) {
+        neuron.setPotential(neuron.getPotential() - KohonenNeuron.P_MIN);
+      } else {
+        neuron.setPotential(neuron.getPotential() + 1.0/(double)network.getNumOfNeurons());
+      }
+      if (neuron.getPotential() < KohonenNeuron.P_MIN) {
+        neuron.setWaiting(true);
+      }
+    }
   }
 
   private void changeWeightGas(double[] vector, int iteration) {

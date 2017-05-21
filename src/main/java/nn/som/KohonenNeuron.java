@@ -6,16 +6,26 @@ import java.util.Random;
  * Neuron with bias and activation function
  */
 public class KohonenNeuron {
+  public static final double P_MIN = 0.75;
   private double[] weights;
+  private double potential; // potential
+  private boolean waiting = false; // needed for potential algorithm
 
-  public KohonenNeuron(int weightNumber, double[] maxWeights) {
-    if (weightNumber != maxWeights.length) {
+  public KohonenNeuron(int weightNumber, double[][] minmaxWeights, double potential) {
+    this.potential = potential;
+    if (weightNumber != minmaxWeights.length) {
       throw new IllegalArgumentException("Wrong number of maxWeights");
     }
     Random rand = new Random();
-    weights = new double[maxWeights.length];
-    for(int i=0; i< weights.length; i++){
-      weights[i] = rand.nextDouble() * maxWeights[i];
+    weights = new double[minmaxWeights.length];
+    for(int i=0; i< weights.length; i++) {
+      double[] weightsRange = minmaxWeights[i];
+      if (weightsRange.length != 2) {
+        weights[i] = rand.nextDouble();
+      } else {
+        // get random number from min - max range
+        weights[i] = weightsRange[0] + (weightsRange[1] - weightsRange[0]) * rand.nextDouble();
+      }
     }
   }
 
@@ -44,6 +54,22 @@ public class KohonenNeuron {
 //      return activationFunction.getValue(value);
 //    else
 //      return value;
+  }
+
+  public double getPotential() {
+    return potential;
+  }
+
+  public void setPotential(double p) {
+    this.potential = p;
+  }
+
+  public boolean isWaiting() {
+    return waiting;
+  }
+
+  public void setWaiting(boolean b) {
+    this.waiting = b;
   }
 
   public String toString(){
