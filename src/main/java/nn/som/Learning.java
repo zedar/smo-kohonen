@@ -59,11 +59,19 @@ public class Learning {
         vector = learningData[j];
         bestNeuron = getBestNeuron(vector);
         changeNeuronWeightWTA(bestNeuron, vector, i);
-        changeNeuronPotential(bestNeuron);
+        //if (i <= 20) {
+          changeNeuronPotential(bestNeuron);
+        //}
+//        else if (i == 21) {
+//          for (int k = 0; k < network.getNumOfNeurons(); k++) {
+//            network.getNeuron(k).setWaiting(false);
+//          }
+//        }
       }
       if (dumpIteration && dumpFilePrefix != null) {
         FileUtils.saveNetworkToFile(network, dumpFilePrefix+(i+1)+(dumpFileExt != null ? dumpFileExt : ""));
       }
+      changeLearningFactor(i+1);
     }
   }
 
@@ -129,11 +137,6 @@ public class Learning {
       weight = weights[i];
       weights[i] += learningFactor * (vector[i] - weight);
     }
-    // update potential for the winning algorithm
-    neuron.setPotential(neuron.getPotential() - KohonenNeuron.P_MIN);
-    if (neuron.getPotential() < KohonenNeuron.P_MIN) {
-      neuron.setWaiting(true);
-    }
   }
 
   private void changeWeightWTM(int neuronNumber,double[] vector, int iteration) {
@@ -169,6 +172,9 @@ public class Learning {
         neuron.setPotential(neuron.getPotential() - KohonenNeuron.P_MIN);
       } else {
         neuron.setPotential(neuron.getPotential() + 1.0/(double)network.getNumOfNeurons());
+      }
+      if (neuron.getPotential() > 1.0) {
+        neuron.setPotential(1.0);
       }
       if (neuron.getPotential() < KohonenNeuron.P_MIN) {
         neuron.setWaiting(true);
