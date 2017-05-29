@@ -82,15 +82,15 @@ public class Learning {
     for (int i = 0; i < maxIterations; i++){
       for(int j= 0; j < dataSize; j++){
         vector = learningData[j];
-        bestNeuron = getBestNeuron(vector)+1;
+        bestNeuron = getBestNeuron(vector);
         changeWeightWTM(bestNeuron, vector, i);
         changeNeuronPotential(bestNeuron);
       }
       if (dumpIteration && dumpFilePrefix != null) {
         FileUtils.saveNetworkToFile(network, dumpFilePrefix+(i+1)+(dumpFileExt != null ? dumpFileExt : ""));
       }
-      changeNeighbourhoodRadius(i+1);
-      changeLearningFactor(i+1);
+      changeNeighbourhoodRadius(i);
+      changeLearningFactor(i);
     }
   }
 
@@ -141,19 +141,18 @@ public class Learning {
 
   private void changeWeightWTM(int neuronNumber,double[] vector, int iteration) {
     TreeMap neighboorhood = network.getTopology().getNeighbourhood(neuronNumber);
+    // IMPORTANT: change weight of the best neuron
+    changeNeuronWeightWTM(neuronNumber, vector, iteration, 0);
+    // IMPORTANT: change weights of the neurons from the neighbourhood
     Iterator it = neighboorhood.keySet().iterator();
-    int neuronNr;
     while(it.hasNext()){
-      neuronNr = (Integer)it.next();
+      int neuronNr = (Integer)it.next();
       changeNeuronWeightWTM(neuronNr,vector,iteration,(Integer)neighboorhood.get(neuronNr));
     }
   }
 
   private void changeNeuronWeightWTM(int neuronNumber, double[] vector, int iteration, int distance) {
-    KohonenNeuron neuron = network.getNeuron(neuronNumber-1);
-//    if (neuron.isWaiting()) {
-//      return;
-//    }
+    KohonenNeuron neuron = network.getNeuron(neuronNumber);
     double[] weights = neuron.getWeights();
     int weightNumber = weights.length;
     double weight;
@@ -161,7 +160,6 @@ public class Learning {
       weight = weights[i];
       weights[i] += learningFactor * GaussNeighbourhood.calc(neighbourhoodRadius, distance) * (vector[i] - weight);
     }
-    //network.getNeuron(neuronNumber).setWeights(weights);
   }
 
   private void changeNeuronPotential(int bestNeuron) {

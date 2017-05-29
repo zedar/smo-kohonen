@@ -41,20 +41,20 @@ public class MatrixTopology {
     List connectedNeurons = new ArrayList();
 
     if ((neuronNumber < cols * rows) && (neuronNumber > 0)){
-      if (neuronNumber - cols > 0) {
+      if (neuronNumber - cols >= 0) {
         connectedNeurons.add(neuronNumber - cols);
       }
 
-      if ((neuronNumber - 1 > 0) && ((neuronNumber % cols) != 1)) {
+      if ((neuronNumber - 1 >= 0) && ((neuronNumber % cols) != 0)) {
         connectedNeurons.add(neuronNumber - 1);
       }
 
-      if ((neuronNumber + 1 <= cols * rows)
-          && ((neuronNumber % cols) != 0)) {
+      if ((neuronNumber + 1 < cols * rows)
+          && ((neuronNumber % cols) != 1)) {
         connectedNeurons.add(neuronNumber + 1);
       }
 
-      if (neuronNumber + cols <= cols * rows) {
+      if (neuronNumber + cols < cols * rows) {
         connectedNeurons.add(neuronNumber + cols);
       }
     }
