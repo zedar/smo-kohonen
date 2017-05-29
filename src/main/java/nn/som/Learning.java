@@ -104,8 +104,8 @@ public class Learning {
       if (dumpIteration && dumpFilePrefix != null) {
         FileUtils.saveNetworkToFile(network, dumpFilePrefix+(i+1)+(dumpFileExt != null ? dumpFileExt : ""));
       }
-      changeNeighbourhoodRadius(i+1);
-      changeLearningFactor(i+1);
+      changeNeighbourhoodRadius(i);
+      changeLearningFactor(i);
     }
   }
 
